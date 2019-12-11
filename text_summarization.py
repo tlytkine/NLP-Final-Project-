@@ -20,16 +20,44 @@ from gensim.summarization import keywords
 from urllib.request import urlopen
 import nltk
 import requests 
+import csv
+import matplotlib.pyplot as plt
+from collections import Counter
+from heapq import nlargest 
+import string 
+from string import digits
 
-# Read datasets
-trumpData = pd.read_csv("trumpImpeachment.csv")
-natsData = pd.read_csv("washingtonNationals.csv")
-redskinsData = pd.read_csv("washingtonRedskins.csv")
-dcMetroData = pd.read_csv("dcMetro.csv")
+# Read datasets 
+trumpData = pd.read_csv('trumpImpeachment.csv',engine='python',header='infer',names=['Tweet','id','date','source','likes','retweets','sentiment'])
+# natsData = pd.read_csv('washingtonNationals.csv',engine='python',header='infer',names=['Tweet','id','date','source','likes','retweets','sentiment'])
+# redskinsData = pd.read_csv('washingtonRedskins.csv',engine='python',header='infer',names=['Tweet','id','date','source','likes','retweets','sentiment'])
+# dcMetroData = pd.read_csv('dcMetro.csv',engine='python',header='infer',names=['Tweet','id','date','source','likes','retweets','sentiment'])
+
 
 # Drop duplicates and NA values
+
+# Trump Data 
 trumpData.drop_duplicates(subset=['Tweet'],inplace=True) 
 trumpData.dropna(axis=0,inplace=True) 
+trumpData["retweets"] = pd.to_numeric(trumpData["retweets"],errors='coerce')
+trumpData = trumpData.nlargest(100, columns=['retweets'])
+# Nats Data 
+# natsData.drop_duplicates(subset=['Tweet'],inplace=True) 
+# natsData.dropna(axis=0,inplace=True) 
+# natsData["retweets"] = pd.to_numeric(natsData["retweets"],errors='coerce')
+# natsData = natsData.nlargest(100, columns=['retweets'])
+# # Redskins data 
+# redskinsData.drop_duplicates(subset=['Tweet'],inplace=True) 
+# redskinsData.dropna(axis=0,inplace=True) 
+# redskinsData["retweets"] = pd.to_numeric(redskinsData["retweets"],errors='coerce')
+# redskinsData = redskinsData.nlargest(100, columns=['retweets'])
+# # Dc metro data
+# dcMetroData.drop_duplicates(subset=['Tweet'],inplace=True) 
+# dcMetroData.dropna(axis=0,inplace=True) 
+# dcMetroData["retweets"] = pd.to_numeric(dcMetroData["retweets"],errors='coerce')
+# dcMetroData = dcMetroData.nlargest(100, columns=['retweets'])
+
+
 
 # Preprocessing 
 
@@ -80,77 +108,143 @@ contraction_mapping = {"ain't": "is not", "aren't": "are not","can't": "cannot",
                            "you're": "you are", "you've": "you have"}
 
 
-# print(data1['Tweet'][:10])
+text_trump = []
 
-stop_words = set(stopwords.words('english'))
-
-def text_cleaner(text):
-    newString = text.lower()
-    newString = BeautifulSoup(newString, "lxml").text
-    newString = re.sub(r'\([^)]*\)', '', newString)
-    newString = re.sub('"','', newString)
-    newString = ' '.join([contraction_mapping[t] if t in contraction_mapping else t for t in newString.split(" ")])    
-    newString = re.sub(r"'s\b","",newString)
-    newString = re.sub("[^a-zA-Z]", " ", newString) 
-    tokens = [w for w in newString.split() if not w in stop_words]
-    long_words=[]
-    for i in tokens:
-        if len(i)>=3:                  #removing short word
-            long_words.append(i)   
-    return (" ".join(long_words)).strip()
-
-cleaned_text_trump = []
-i = 0 
 for t in trumpData['Tweet']:
-	cleaned_text_trump.append(text_cleaner(t))
-	i += 1 
-	if i == 100:
-		break
+	t = re.sub(r'(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:\'".,<>?«»“”‘’]))', '', t)
+	t = re.sub('\W+',' ', t)
+	remove_digits = str.maketrans('', '', digits)
+	t = t.translate(remove_digits)
+	# shortword = re.compile(r'\W*\b\w{1,3}\b')
+	# shortword.sub('',t)
+	# words = set(nltk.corpus.words.words())
+	# t = " ".join(w for w in nltk.wordpunct_tokenize(t) if w.lower() in words or not w.isalpha())
+	text_trump.append(t)
 
+# text_nats = []
 
-def listToString(s):
-	str1 = ""
+# for t in natsData['Tweet']:
+# 	t = re.sub('\W+',' ', t)
+# 	shortword = re.compile(r'\W*\b\w{1,3}\b')
+# 	shortword.sub('',t)
+# 	words = set(nltk.corpus.words.words())
+# 	t = " ".join(w for w in nltk.wordpunct_tokenize(t) if w.lower() in words or not w.isalpha())
+# 	text_nats.append(t)
 
-	for ele in s:
-		str1 += ele 
-		str1 += "\n"
-	return str1
+# text_redskins = []
 
+# for t in redskinsData['Tweet']:
+# 	t = re.sub('\W+',' ', t)
+# 	shortword = re.compile(r'\W*\b\w{1,3}\b')
+# 	shortword.sub('',t)
+# 	words = set(nltk.corpus.words.words())
+# 	t = " ".join(w for w in nltk.wordpunct_tokenize(t) if w.lower() in words or not w.isalpha())
+# 	text_redskins.append(t)
 
+# text_dcMetro = []
 
-# print(trumpData['Tweet'][:10])
+# for t in dcMetroData['Tweet']:
+# 	t = re.sub('\W+',' ', t)
+# 	shortword = re.compile(r'\W*\b\w{1,3}\b')
+# 	shortword.sub('',t)
+# 	words = set(nltk.corpus.words.words())
+# 	t = " ".join(w for w in nltk.wordpunct_tokenize(t) if w.lower() in words or not w.isalpha())
+# 	text_dcMetro.append(t)
 
-# Add summmary to data 
+# Create word frequency table from text 
+# Does not include stopwords 
 def create_frequency_table(text_string) -> dict:
-	stopWords = set(stopwords.words("english"))
-	words = word_tokenize(text_string)
-	ps = PorterStemmer()
+	stopwords = nltk.corpus.stopwords.words('english')
+	stopWords = set(stopwords)
 
+	words = word_tokenize(text_string)
 	freqTable = dict()
 	for word in words:
-		word = ps.stem(word)
+		word = word.lower()
 		if word in stopWords:
 			continue 
+		if(len(word) < 3):
+			continue
 		if word in freqTable:
 			freqTable[word] += 1
 		else:
 			freqTable[word] = 1 
 	return freqTable 
 
-def score_sentences(sentences,freqTable) -> dict:
-	sentenceValue = dict()
-	for sentence in sentences:
-		word_count_in_sentence = (len(word_tokenize(sentence)))
-		for wordValue in freqTable:
-			if wordValue in sentence.lower():
-				if sentence[:10] in sentenceValue:
-					sentenceValue[sentence[:10]] += freqTable[wordValue]
-				else:
-					sentenceValue[sentence[:10]] = freqTable[wordValue]
 
-		sentenceValue[sentence[:10]] = sentenceValue[sentence[:10]] // word_count_in_sentence
+cleanedTrumpTweets = " ".join(text_trump)
 
-	return sentenceValue 
+
+trumpFreqTable = create_frequency_table(cleanedTrumpTweets)
+
+ten_largest_trump = nlargest(10,trumpFreqTable, key=trumpFreqTable.get)
+
+trumpFreqTableNew = dict()
+for word in ten_largest_trump:
+ 	if word in trumpFreqTable:
+ 		trumpFreqTableNew[word] = trumpFreqTable[word]
+
+# plt.bar(range(len(trumpFreqTableNew)), list(trumpFreqTableNew.values()), align='center')
+# plt.xticks(range(len(trumpFreqTableNew)), list(trumpFreqTableNew.keys()), rotation='vertical')
+# plt.tight_layout()
+# plt.show()
+
+# cleanedNatsTweets = " ".join(text_nats)
+
+
+# natsFreqTable = create_frequency_table(cleanedNatsTweets)
+
+# ten_largest_nats = nlargest(10,natsFreqTable, key=natsFreqTable.get)
+
+# natsFreqTableNew = dict()
+# for word in ten_largest_nats:
+#  	if word in natsFreqTable:
+#  		natsFreqTableNew[word] = natsFreqTable[word]
+
+
+# plt.bar(range(len(natsFreqTableNew)), list(natsFreqTableNew.values()), align='center')
+# plt.xticks(range(len(natsFreqTableNew)), list(natsFreqTableNew.keys()), rotation='vertical')
+# plt.tight_layout()
+# plt.show()
+
+# cleanedRedskinsTweets = " ".join(text_redskins)
+
+
+# redskinsFreqTable = create_frequency_table(cleanedRedskinsTweets)
+
+# ten_largest_redskins = nlargest(10,redskinsFreqTable, key=redskinsFreqTable.get)
+
+# redskinsFreqTableNew = dict()
+# for word in ten_largest_redskins:
+#  	if word in redskinsFreqTable:
+#  		redskinsFreqTableNew[word] = redskinsFreqTable[word]
+
+# plt.bar(range(len(redskinsFreqTableNew)), list(redskinsFreqTableNew.values()), align='center')
+# plt.xticks(range(len(redskinsFreqTableNew)), list(redskinsFreqTableNew.keys()), rotation='vertical')
+# plt.tight_layout()
+# plt.show()
+
+# cleanedDCmetroTweets = " ".join(text_dcMetro)
+
+
+# dcMetroFreqTable = create_frequency_table(cleanedDCmetroTweets)
+
+# ten_largest_dcMetro = nlargest(10,dcMetroFreqTable, key=dcMetroFreqTable.get)
+
+# dcMetroFreqTableNew = dict()
+# for word in ten_largest_dcMetro:
+#  	if word in dcMetroFreqTable:
+#  		dcMetroFreqTableNew[word] = dcMetroFreqTable[word]
+
+
+# plt.bar(range(len(dcMetroFreqTableNew)), list(dcMetroFreqTableNew.values()), align='center')
+# plt.xticks(range(len(dcMetroFreqTableNew)), list(dcMetroFreqTableNew.keys()), rotation='vertical')
+# plt.tight_layout()
+# plt.show()
+
+
+
+
 
 def find_average_score(sentenceValue) -> int: 
 	sumValues = 0
@@ -162,228 +256,97 @@ def find_average_score(sentenceValue) -> int:
 
 	return average 
 
-def generate_summary(sentences, sentenceValue, threshold):
-    sentence_count = 0
-    summary = ''
-    for sentence in sentences:
-        if sentence[:10] in sentenceValue and sentenceValue[sentence[:10]] > (threshold):
-            summary += " " + sentence
-            sentence_count += 1
-            # print("Sentence %d \n" % (sentence_count) )
+tenSentText = ""
 
-    return summary
-
-
-
-def listToString(s):
-	str1 = ""
-
-	for ele in s:
-		str1 += ele 
-		str1 += "\n"
-	return str1
-
-cleaned_string_trump = listToString(cleaned_text_trump)
-
-
-# print(cleaned_string_trump)
-
-def allTweetsSummaryGenerator(cleanedTweets):
-	# Create word frequency table 
-	freq_table = create_frequency_table(cleanedTweets)
-	# Tokenize sentences 
-	sentences = sent_tokenize(cleanedTweets)
-	# Score the sentences 
-	sentence_scores = score_sentences(sentences,freq_table)
-	# Find threshold 
-	threshold = find_average_score(sentence_scores)
-	# Generate summary 
-	summary = generate_summary(sentences, sentence_scores, 1.5*threshold )
-	return summary
-
-
-# trump_summary = allTweetsSummaryGenerator(cleaned_string_trump)
-
-# print(trump_summary)
-
-# cleaned_string_trump = cleaned_string_trump.strip()
-# cleaned_string_trump = " ".join(cleaned_string_trump.split())
-s = cleaned_string_trump
-
- 
-s = re.sub(r"^\s+|\s+$", "", s)
-
-# print("Summary Begin: %s\n" % (summarize(s)))
-# print("Summary End:")
-
-# print(cleaned_string_trump)
-
-
-# trump_summary = allTweetsSummaryGenerator(s)
-
-# print(trump_summary)
-
-file = open('sampletext.txt',mode='r')
-
-text = file.read()
-
-file.close()
-# textSum = allTweetsSummaryGenerator(text)
-# print(textSum)
-
-
-# Summary generation implemented without library 
-def summaryGenerator(data):
-	summaries = [] 
-	tweets = [] 
-	limit = 0 
-	for tweet in data:
-		# Clean tweet 
-		tweet = tweet + "\n"
-		tweet += "Donald Trump"
-		tweet += "\n"
-		# tweet += "Impeachment"
-		# tweet += "\n"
-		cleanedTweet = tweet
-		words = set(nltk.corpus.words.words())
-		cleanedTweet = " ".join(w for w in nltk.wordpunct_tokenize(cleanedTweet) \
-         if w.lower() in words or not w.isalpha())
-		# Create word frequency table 
-		freq_table = create_frequency_table(cleanedTweet)
-		# Tokenize sentences 
-		sentences = sent_tokenize(cleanedTweet)
-		# Score the sentences 
-		sentence_scores = score_sentences(sentences,freq_table)
-		# Find threshold 
-		threshold = find_average_score(sentence_scores)
-		# Generate summary 
-		summary = generate_summary(sentences, sentence_scores, 1.5*threshold )
-		# Add summary 
-		word = 'Donald Trump'
-		word_list = summary.split();
-		summary = ' '.join([i for i in word_list if i not in word])
-		summary = summary.strip()
-		if(len(summary) > 3):
-			summaries.append(summary)
-			tweets.append(tweet)
-			limit += 1 
-		if limit == 100:
-			break
-
-	# summaries = pd.DataFrame(list(zip(tweets, summaries)), columns =['Tweet', 'Summary']) 
-
-	return summaries
-
-# Print tweet summaries
-def summary_cleaner(text):
-	newString = re.sub('"','', text)
-	newString = ' '.join([contraction_mapping[t] if t in contraction_mapping else t for t in newString.split(" ")])
-	newString = re.sub(r"'s\b","",newString)
-	newString = re.sub("[^a-zA-Z]"," ",newString)
-	newString = newString.lower()
-	tokens = newString.split()
-	newString = ''
-	for i in tokens:
-		if len(i)>1:
-			newString = newString + i + ' '
-	return newString 
-
-
-
-
-
-# Summarization using summarize function in nltk
-def summaryGenerator2(data):
-	i = 0 
-	summaries = []
-
-	for tweet in data:
-		# tweet = text_cleaner(tweet)
-		tweet = tweet + "\n"
-		# tweet += "Donald Trump"
-		tweet += "\n"
-		# tweet += "Impeachment"
-		tweet += "\n"
-		summary = summarize(tweet)
-		if(len(summary) > 5 and summary != ''):
-			i+= 1
-			summaries.append(summary)
-		if i == 100:
-			break
-	return summaries 
-
-# Get summaries 
-# trumpSummaries = summaryGenerator(trumpData['Tweet'])
-
-
-
-summaries = [] 
-tweets = [] 
-i = 0 
-for tweet in trumpData['Tweet']:
-	# Clean tweet 
-	tweet = tweet + "\n"
-	tweet += "Donald Trump"
-	tweet += "\n"
-	# tweet += "Impeachment"
-	# tweet += "\n"
-	cleanedTweet = tweet
-	words = set(nltk.corpus.words.words())
-	cleanedTweet = " ".join(w for w in nltk.wordpunct_tokenize(cleanedTweet) \
-		if w.lower() in words or not w.isalpha())
-	# Create word frequency table 
-	freq_table = create_frequency_table(cleanedTweet)
-	# Tokenize sentences 
-	sentences = sent_tokenize(cleanedTweet)
-	# Score the sentences 
-	sentence_scores = score_sentences(sentences,freq_table)
-	# Find threshold 
-	threshold = find_average_score(sentence_scores)
-	# Generate summary 
-	summary = generate_summary(sentences, sentence_scores, 1.5*threshold )
-	# Add summary 
-	word = 'Donald Trump'
-	word_list = summary.split();
-	summary = ' '.join([i for i in word_list if i not in word])
-	tweet = ' '.join([i for i in word_list if i not in word])
-	summary = summary.strip()
-	if(len(summary) > 3):
-		summaries.append(summary)
-		tweets.append(tweet)
-		i = i+1
-	if i == 10:
+i = 0
+# Get 10 sentences 
+for tweet in text_trump:
+	if(i==10):
 		break
+	tweet = ' '.join(tweet.split())
+	toAdd = ' '.join( [w for w in tweet.split() if len(w)>1] )
+	toAdd.lstrip()
+	toAdd.rstrip()
+	tenSentText += " " + toAdd.lower()
+	i = i+1
+
+
+tenSent = []
+
+i = 0
+# Get 10 sentences 
+for tweet in text_trump:
+	if(i==10):
+		break
+	tweet = ' '.join(tweet.split())
+	toAdd = ' '.join( [w for w in tweet.split() if len(w)>1] )
+	toAdd.lstrip()
+	toAdd.rstrip()
+	tenSent.append(toAdd.lower())
+	i = i+1
+
+
+# Create word frequency table 
+freq_table = create_frequency_table(tenSentText)
+# Tokenize sentences 
+sentences = sent_tokenize(tenSentText)
+# Score Sentences 
+print("Scoring sentences: ")
+sentenceValue = dict()
+for sentence in tenSent:
+	print("Sentence: ")
+	print(sentence)
+	word_count_in_sentence = (len(word_tokenize(sentence)))
+	for wordValue in freq_table:
+		if wordValue in sentence.lower():
+				if sentence[:10] in sentenceValue:
+					sentenceValue[sentence[:10]] += freq_table[wordValue]
+				else:
+					sentenceValue[sentence[:10]] = freq_table[wordValue]
+		print("sentence[:10]: ")
+		print(sentence[:10])
+		if(sentence[:10] in sentenceValue):
+			sentenceValue[sentence[:10]] = sentenceValue[sentence[:10]] // word_count_in_sentence
+sentence_scores = sentenceValue 
+threshold = find_average_score(sentence_scores)
+
+	
+sentence_count = 0
+summary = ''
+for sentence in tenSent:
+	if sentence[:10] in sentenceValue and sentenceValue[sentence[:10]] > (threshold):
+		summary += " " + sentence
+		sentence_count += 1
+
+
+# Print ten sentences 
+print("Original: ")
+print(tenSent)
+print("Summary: ")
+print(summary)
+
+# 1. Get tweets in list 
+# Generate bigrams 
+# Put bigrams into dictionary with frequency for all tweets 
+# Pick tweets who have the most bigrams 
 
 
 
-for i in range(len(summaries)):
-	print("Tweet: ")
-	print(tweets[i])
-	print("Summary: ")
-	print(summary_cleaner(summaries[i]))
-	print("\n")
 
-listDF = list(zip(tweets, summaries))  
-
-trumpDF = pd.DataFrame(list_of_tuples, columns = ['Name', 'Age']
-trumpDF[]
-# tweetNum = 0
-# for i in range(len(summaries)):
-# 	tweetNum += 1 
-# 	print("Tweet %d: %s \n" % (tweetNum,tweets[i]))
-#  	print("Summary: %s: \n" % (summary_cleaner(summaries[i])))
-
-
-
-
-# tweetNum = 0
-# for tweet, summary in trumpSummaries:
-#  	tweetNum += 1 
-#  	print("Tweet: %s \n " % (tweet))
-#  	print("Tweet Summary: %d " % (tweetNum))
-#  	print(summary_cleaner(summary))
-#  	# print(summary_cleaner(summary))
-#  	print("\n")
+def generate_ngrams(s, n):
+    # Convert to lowercases
+    s = s.lower()
+    
+    # Replace all none alphanumeric characters with spaces
+    s = re.sub(r'[^a-zA-Z0-9\s]', ' ', s)
+    
+    # Break sentence in the token, remove empty tokens
+    tokens = [token for token in s.split(" ") if token != ""]
+    
+    # Use the zip function to help us generate n-grams
+    # Concatentate the tokens into ngrams and return
+    ngrams = zip(*[token[i:] for i in range(n)])
+    return [" ".join(ngram) for ngram in ngrams]
 
 
 
@@ -392,9 +355,12 @@ trumpDF[]
 
 
 
+# for tweet in text_trump:
+# 	print("Summary: ")
+# 	print(TweetSummaryGenerator(tweet))
+	# trumpSummaries.append(TweetSummaryGenerator(tweet))
 
-
-
+# print(trumpSummaries[0])
 
 
 

@@ -1,0 +1,31 @@
+Braden Meyerhoefer and Tim Lytkine
+NLP Final Project
+Fall 2019
+
+The following is instructions for running our scripts:
+
+Tweet gathering:
+    In the tweet_gathering folder, the script gatherTweets.py shows
+    how we used the Twitter API with tweepy to gather our Twitter data.
+    This script cannot be run, as we are not providing our API creds,
+    but it is short and can be examined to see how we went about doing so.
+    The csv files in the root folder are the result of this script.
+
+Deep Learning Models:
+    In the deep_learning folder are our attempts at deep learning summarization.
+
+    charSummarizer.py can be run, but it will take 6 hours on a macbook pro and
+    the results are not worth it. The results can be seen in the report, and the
+    model it produces is 1000_data_char_model.h5.
+
+    wordSummarizer.py is our attempt at changing the s2s model from character level
+    to word level, which is much more common in the area of text summarization.
+    This can be run, but has an error in the fit call that we were not able to figure
+    out.
+
+    translator.py is the english-french translator that does work, was taken from
+    the keras blog mentioned in the report, and can be run in a very quick amount
+    of time for good results. It is included as a demonstration that the encoder-decoder
+    model is set up correctly, yet does not work for the task of summarization.
+    The resources we found on summarization using basic encoder-decoder use basically
+    the same code, so we were unable to figure out why it didn't work for us.

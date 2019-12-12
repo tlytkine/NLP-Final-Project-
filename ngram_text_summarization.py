@@ -45,10 +45,6 @@ for tweet in trumpData['Tweet']:
 	tweet = re.sub('\W+',' ', tweet)
 	remove_digits = str.maketrans('', '', digits)
 	tweet = tweet.translate(remove_digits)
-	# shortword = re.compile(r'\W*\b\w{1,3}\b')
-	# shortword.sub('',t)
-	# words = set(nltk.corpus.words.words())
-	# t = " ".join(w for w in nltk.wordpunct_tokenize(t) if w.lower() in words or not w.isalpha())
 	trump_tweet_text += tweet
 	trump_tweet_text += "."
 
@@ -59,10 +55,6 @@ for tweet in trumpData['Tweet']:
 	tweet = re.sub('\W+',' ', tweet)
 	remove_digits = str.maketrans('', '', digits)
 	tweet = tweet.translate(remove_digits)
-	# shortword = re.compile(r'\W*\b\w{1,3}\b')
-	# shortword.sub('',t)
-	# words = set(nltk.corpus.words.words())
-	# t = " ".join(w for w in nltk.wordpunct_tokenize(t) if w.lower() in words or not w.isalpha())
 	tweet = ' '.join(tweet.split())
 	toAdd = ' '.join( [w for w in tweet.split() if len(w) > 1])
 	toAdd.lstrip()
@@ -95,10 +87,6 @@ for tweet in trumpDataCopy['Tweet']:
 	tweet = tweet.split()
 	tweet[0].capitalize()
 	tweet = ' '.join(tweet)
-	# shortword = re.compile(r'\W*\b\w{1,3}\b')
-	# shortword.sub('',t)
-	# words = set(nltk.corpus.words.words())
-	# t = " ".join(w for w in nltk.wordpunct_tokenize(t) if w.lower() in words or not w.isalpha())
 	test_text_trump += tweet
 	test_text_trump += "."
 
@@ -109,10 +97,6 @@ for tweet in trumpDataCopy['Tweet']:
 	tweet = re.sub('\W+',' ', tweet)
 	remove_digits = str.maketrans('', '', digits)
 	tweet = tweet.translate(remove_digits)
-	# shortword = re.compile(r'\W*\b\w{1,3}\b')
-	# shortword.sub('',t)
-	# words = set(nltk.corpus.words.words())
-	# t = " ".join(w for w in nltk.wordpunct_tokenize(t) if w.lower() in words or not w.isalpha())
 	tweet = ' '.join(tweet.split())
 	toAdd = ' '.join( [w for w in tweet.split() if len(w) > 1])
 	toAdd.lstrip()

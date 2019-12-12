@@ -29,3 +29,6 @@ Deep Learning Models:
     model is set up correctly, yet does not work for the task of summarization.
     The resources we found on summarization using basic encoder-decoder use basically
     the same code, so we were unable to figure out why it didn't work for us.
+
+img:
+    This folder contains any visualizations we made.

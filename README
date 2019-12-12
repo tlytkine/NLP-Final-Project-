@@ -30,5 +30,9 @@ Deep Learning Models:
     The resources we found on summarization using basic encoder-decoder use basically
     the same code, so we were unable to figure out why it didn't work for us.
 
+Bigram Text Summarization Model:
+    "python ngram_text_summarization.py" needs to be run in the root directory of this folder in order 
+    to run this model
+
 visualizations:
     This folder contains any visualizations we made.

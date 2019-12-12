@@ -15,6 +15,8 @@ from collections import Counter
 from heapq import nlargest 
 import string 
 from string import digits
+import time 
+start_time = time.time()
 
 print("ngram Text Summarization Model")
 
@@ -34,8 +36,7 @@ trumpData = trumpData.nlargest(140, columns=['retweets'])
 trumpDataCopy = trumpData.nlargest(60, columns=['retweets'])
 
 
-# Use 140 to train
-# Use 60 to test 
+# Use 140 to train, use 60 to test 
 # 4. Get each tweet in a body of text 
 # Training data
 trump_tweet_text = ""
@@ -284,9 +285,7 @@ print(numTweetsAdded)
 tweetIDFreqs = pd.DataFrame(list(tweetIDFreqs.items()), columns=['Tweet_ID','Frequency'])
 
 
-
-
-
+print("Model executed in %s seconds" % (time.time() - start_time))
 
 
 
